@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>널스어(語) — 간호 영어 단어장</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --mint-50:#f1faf7; --mint-100:#e1f4ee; --mint-500:#3d9a8b; --mint-600:#2f7d70; --mint-700:#245f55;
+  --coral-500:#ff7f6b; --coral-100:#ffe4df;
+  --sun-400:#ffc857;
+  --ink:#22323a; --ink-soft:#5b6b70; --paper:#fbfdfc; --card:#ffffff; --line:#e3ede9;
+  --shadow: 0 8px 20px -10px rgba(36,95,85,.25);
+  box-sizing:border-box;
+  padding-top: env(safe-area-inset-top,0px);
+  padding-bottom: env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;}
+html{scroll-padding-top: env(safe-area-inset-top,0px);}
+html,body{height:100%;}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:'Noto Sans KR', sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+h1,h2,h3,.brand,.tabbtn,.score-num{font-family:'Jua','Noto Sans KR',sans-serif;}
+
+.wrap{max-width:720px; margin:0 auto; padding:18px 16px calc(92px + env(safe-area-inset-bottom,0px));}
+
+header.top{
+  position:sticky; top:env(safe-area-inset-top,0px); z-index:10;
+  background:linear-gradient(180deg, var(--mint-500), var(--mint-600));
+  color:#fff; padding:18px 16px calc(16px + env(safe-area-inset-top,0px));
+  border-radius:0 0 22px 22px;
+  box-shadow: var(--shadow);
+}
+.brand{display:flex; align-items:center; gap:10px; font-size:22px; line-height:1;}
+.brand .badge{
+  width:34px; height:34px; border-radius:10px; background:rgba(255,255,255,.18);
+  display:flex; align-items:center; justify-content:center; font-size:18px;
+}
+.brand small{display:block; font-family:'Noto Sans KR'; font-weight:400; font-size:12px; opacity:.85; margin-top:2px;}
+
+/* ---- 하단 내비게이션 ---- */
+nav.bottomnav{
+  position:fixed; left:0; right:0; bottom:0; z-index:20;
+  display:flex; justify-content:space-around; align-items:stretch;
+  background:var(--card); border-top:1px solid var(--line);
+  padding:8px 8px calc(8px + env(safe-area-inset-bottom,0px));
+  box-shadow: 0 -6px 18px -12px rgba(36,95,85,.3);
+}
+.tabbtn{
+  flex:1; max-width:140px; border:none; background:none; cursor:pointer;
+  display:flex; flex-direction:column; align-items:center; gap:3px;
+  padding:6px 4px; border-radius:14px; color:var(--ink-soft); font-size:11.5px;
+  transition:background .15s, color .15s, transform .1s;
+}
+.tabbtn .ic{font-size:20px; line-height:1;}
+.tabbtn.active{color:var(--mint-600); background:var(--mint-50);}
+.tabbtn:active{transform:scale(.94);}
+
+section.panel{display:none; padding-top:18px;}
+section.panel.active{display:block;}
+
+/* ---- 단어장 ---- */
+.searchrow{display:flex; gap:8px; margin-bottom:14px;}
+.searchrow input{
+  flex:1; padding:11px 14px; border-radius:14px; border:1.5px solid var(--line);
+  font-size:15px; font-family:inherit; background:var(--card);
+}
+.searchrow input:focus{outline:2px solid var(--mint-500); outline-offset:1px;}
+.catrow{display:flex; gap:6px; overflow-x:auto; padding-bottom:4px; margin-bottom:14px;}
+.catchip{
+  flex:none; padding:7px 13px; border-radius:999px; border:1.5px solid var(--line);
+  background:var(--card); font-size:13px; color:var(--ink-soft); cursor:pointer; white-space:nowrap;
+}
+.catchip.active{background:var(--mint-500); border-color:var(--mint-500); color:#fff;}
+
+.grid{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+@media (max-width:420px){.grid{grid-template-columns:1fr;}}
+
+.word-card{
+  perspective:800px; height:118px; cursor:pointer;
+}
+.word-card-inner{
+  position:relative; width:100%; height:100%; transition:transform .45s cubic-bezier(.4,.2,.2,1);
+  transform-style:preserve-3d;
+}
+.word-card.flipped .word-card-inner{transform:rotateY(180deg);}
+.face{
+  position:absolute; inset:0; border-radius:16px; padding:12px 14px;
+  backface-visibility:hidden; display:flex; flex-direction:column; justify-content:center;
+  box-shadow:var(--shadow); border:1px solid var(--line);
+}
+.face.front{background:var(--card);}
+.face.back{background:var(--mint-50); transform:rotateY(180deg); border-color:var(--mint-100);}
+.face .en{font-weight:700; font-size:16px; color:var(--ink);}
+.face .pron{font-size:12px; color:var(--ink-soft); margin-top:2px;}
+.face .kr{font-weight:700; font-size:15px; color:var(--mint-700);}
+.face .ex{font-size:11.5px; color:var(--ink-soft); margin-top:6px; line-height:1.4;}
+.face .cat{
+  position:absolute; top:10px; right:10px; font-size:10px; padding:2px 8px; border-radius:999px;
+  background:var(--coral-100); color:#c85340;
+}
+.face .flip-hint{position:absolute; bottom:8px; right:10px; font-size:10px; color:#b8c4c0;}
+.emptynote{text-align:center; color:var(--ink-soft); font-size:13px; padding:30px 10px;}
+
+/* ---- 추가 ---- */
+.formcard{
+  background:var(--card); border:1px solid var(--line); border-radius:18px; padding:18px; box-shadow:var(--shadow);
+}
+.formcard h2{margin:0 0 4px; font-size:19px; color:var(--mint-700);}
+.formcard p.sub{margin:0 0 16px; font-size:13px; color:var(--ink-soft);}
+.field{margin-bottom:12px;}
+.field label{display:block; font-size:12.5px; font-weight:700; color:var(--ink-soft); margin-bottom:5px;}
+.field input, .field select, .field textarea{
+  width:100%; padding:10px 12px; border-radius:12px; border:1.5px solid var(--line);
+  font-family:inherit; font-size:14.5px; background:#fcfefd;
+}
+.field textarea{resize:vertical; min-height:52px;}
+.field input:focus, .field select:focus, .field textarea:focus{outline:2px solid var(--mint-500); outline-offset:1px;}
+.row2{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+.btn{
+  border:none; border-radius:14px; padding:12px 18px; font-size:15px; font-weight:700; cursor:pointer;
+  font-family:'Jua','Noto Sans KR'; transition:transform .1s;
+}
+.btn:active{transform:scale(.97);}
+.btn-primary{background:var(--mint-500); color:#fff; width:100%;}
+.btn-primary:hover{background:var(--mint-600);}
+.toast{
+  margin-top:12px; background:var(--mint-50); color:var(--mint-700); border:1px solid var(--mint-100);
+  padding:10px 12px; border-radius:12px; font-size:13px; display:none;
+}
+.mylist{margin-top:22px;}
+.mylist h3{font-size:15px; color:var(--ink-soft); margin:0 0 10px;}
+.myitem{
+  display:flex; justify-content:space-between; align-items:center; background:var(--card);
+  border:1px solid var(--line); border-radius:12px; padding:10px 12px; margin-bottom:8px; font-size:13.5px;
+}
+.myitem .del{background:none; border:none; color:#c85340; font-size:12px; cursor:pointer; padding:4px 6px;}
+
+/* ---- 퀴즈 ---- */
+.quiz-top{display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;}
+.score-box{background:var(--card); border:1px solid var(--line); border-radius:14px; padding:8px 14px; text-align:center; box-shadow:var(--shadow);}
+.score-num{font-size:20px; color:var(--mint-600);}
+.score-label{font-size:10px; color:var(--ink-soft);}
+.quizcard{
+  background:var(--card); border:1px solid var(--line); border-radius:20px; padding:26px 20px; box-shadow:var(--shadow); text-align:center;
+}
+.quizcard .qmeta{font-size:11px; color:var(--ink-soft); margin-bottom:6px;}
+.quizcard .qword{font-size:26px; font-weight:900; color:var(--ink); margin-bottom:4px;}
+.quizcard .qpron{font-size:13px; color:var(--ink-soft); margin-bottom:18px;}
+.options{display:grid; gap:10px;}
+.opt{
+  border:1.5px solid var(--line); background:#fcfefd; border-radius:14px; padding:12px 14px; font-size:14.5px;
+  cursor:pointer; text-align:left; font-family:inherit;
+}
+.opt:active{transform:scale(.99);}
+.opt.correct{background:var(--mint-50); border-color:var(--mint-500); color:var(--mint-700); font-weight:700;}
+.opt.wrong{background:var(--coral-100); border-color:var(--coral-500); color:#c85340; font-weight:700;}
+.opt[disabled]{cursor:default;}
+.nextrow{margin-top:16px; display:flex; justify-content:center;}
+.btn-next{background:var(--sun-400); color:#5c4200; display:none;}
+.quiz-done{text-align:center; padding:20px 10px;}
+.quiz-done .big{font-size:44px; margin-bottom:6px;}
+.quiz-done p{color:var(--ink-soft); font-size:14px;}
+
+footer{text-align:center; font-size:11px; color:#a6b6b1; margin-top:30px;}
+
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#132320; --card:#1a2f2b; --line:#25423c; --ink:#eaf3f0; --ink-soft:#9db3ac;
+    --mint-50:#173330; --mint-100:#1c3a35;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#132320; --card:#1a2f2b; --line:#25423c; --ink:#eaf3f0; --ink-soft:#9db3ac;
+  --mint-50:#173330; --mint-100:#1c3a35;
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="brand">
+    <div class="badge">🩺</div>
+    <div>
+      널스어(語)
+      <small>간호대생을 위한 영어 단어장</small>
+    </div>
+  </div>
+  </header>
+
+<!-- 단어장 -->
+<section class="panel active" id="panel-list">
+  <div class="searchrow">
+    <input type="text" id="searchInput" placeholder="영단어 또는 한글 뜻 검색…">
+  </div>
+  <div class="catrow" id="catRow"></div>
+  <div class="grid" id="wordGrid"></div>
+  <p class="emptynote" id="emptyNote" style="display:none;">검색 결과가 없어요. 다른 단어로 찾아볼까요?</p>
+</section>
+
+<!-- 단어 추가 -->
+<section class="panel" id="panel-add">
+  <div class="formcard">
+    <h2>새 단어 추가하기</h2>
+    <p class="sub">내가 배운 단어를 등록하면 단어장과 퀴즈에 바로 추가돼요.</p>
+    <div class="field"><label>영단어</label><input id="f-en" placeholder="예: catheter"></div>
+    <div class="row2">
+      <div class="field"><label>발음 (선택)</label><input id="f-pron" placeholder="예: [ˈkæθətər]"></div>
+      <div class="field"><label>카테고리</label>
+        <select id="f-cat">
+          <option value="활력징후">활력징후</option>
+          <option value="투약">투약</option>
+          <option value="해부생리">해부생리</option>
+          <option value="처치·검사">처치·검사</option>
+          <option value="질환">질환</option>
+          <option value="기타">기타</option>
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>한글 뜻</label><input id="f-kr" placeholder="예: 카테터, 도뇨관"></div>
+    <div class="field"><label>예문 (선택)</label><textarea id="f-ex" placeholder="예: Insert the catheter gently."></textarea></div>
+    <button class="btn btn-primary" id="addBtn">단어장에 추가하기</button>
+    <div class="toast" id="addToast">✓ 추가되었어요!</div>
+  </div>
+
+  <div class="mylist" id="myListWrap">
+    <h3>내가 추가한 단어</h3>
+    <div id="myList"></div>
+  </div>
+</section>
+
+<!-- 퀴즈 -->
+<section class="panel" id="panel-quiz">
+  <div class="quiz-top">
+    <div class="score-box"><div class="score-num" id="scoreNum">0/0</div><div class="score-label">정답 수</div></div>
+    <div class="score-box"><div class="score-num" id="quizIdx">1</div><div class="score-label">번 문제</div></div>
+  </div>
+  <div id="quizArea"></div>
+</section>
+
+<footer>내가 추가한 단어는 이 브라우저에만 저장돼요 🌿</footer>
+</div>
+
+<nav class="bottomnav">
+  <button class="tabbtn active" data-tab="list"><span class="ic">📖</span>단어장</button>
+  <button class="tabbtn" data-tab="add"><span class="ic">➕</span>단어 추가</button>
+  <button class="tabbtn" data-tab="quiz"><span class="ic">🧠</span>퀴즈</button>
+</nav>
+
+<script>
+const BUILTIN = [
+ {en:"vital signs",pron:"[ˈvaɪtl saɪnz]",kr:"활력 징후",cat:"활력징후",ex:"Check the patient's vital signs every 4 hours."},
+ {en:"blood pressure",pron:"[blʌd ˈprɛʃər]",kr:"혈압",cat:"활력징후",ex:"Her blood pressure is 120 over 80."},
+ {en:"pulse",pron:"[pʌls]",kr:"맥박",cat:"활력징후",ex:"The pulse rate was 78 beats per minute."},
+ {en:"respiration",pron:"[ˌrɛspəˈreɪʃən]",kr:"호흡",cat:"활력징후",ex:"Respiration rate should be counted for one full minute."},
+ {en:"temperature",pron:"[ˈtɛmpərətʃər]",kr:"체온",cat:"활력징후",ex:"The patient's temperature is 38.5°C."},
+ {en:"catheter",pron:"[ˈkæθətər]",kr:"카테터, 도뇨관",cat:"처치·검사",ex:"Insert the catheter using a sterile technique."},
+ {en:"IV line",pron:"[ˌaɪ ˈviː laɪn]",kr:"정맥 주사 라인",cat:"처치·검사",ex:"The IV line was placed in the left arm."},
+ {en:"dressing",pron:"[ˈdrɛsɪŋ]",kr:"드레싱, 상처 처치",cat:"처치·검사",ex:"Change the dressing every day to prevent infection."},
+ {en:"suture",pron:"[ˈsuːtʃər]",kr:"봉합(사)",cat:"처치·검사",ex:"The nurse removed the sutures after ten days."},
+ {en:"auscultation",pron:"[ˌɔːskəlˈteɪʃən]",kr:"청진",cat:"처치·검사",ex:"Auscultation of the lungs revealed crackles."},
+ {en:"medication",pron:"[ˌmɛdɪˈkeɪʃən]",kr:"투약, 약물",cat:"투약",ex:"Administer the medication after meals."},
+ {en:"dosage",pron:"[ˈdoʊsɪdʒ]",kr:"용량",cat:"투약",ex:"Double-check the dosage before injection."},
+ {en:"intravenous",pron:"[ˌɪntrəˈviːnəs]",kr:"정맥 내의",cat:"투약",ex:"The drug was given intravenously."},
+ {en:"analgesic",pron:"[ˌænəlˈdʒiːzɪk]",kr:"진통제",cat:"투약",ex:"An analgesic was prescribed for pain relief."},
+ {en:"side effect",pron:"[saɪd ɪˈfɛkt]",kr:"부작용",cat:"투약",ex:"Nausea is a common side effect of this drug."},
+ {en:"artery",pron:"[ˈɑːrtəri]",kr:"동맥",cat:"해부생리",ex:"The femoral artery is located in the thigh."},
+ {en:"vein",pron:"[veɪn]",kr:"정맥",cat:"해부생리",ex:"Blood was drawn from a vein in the arm."},
+ {en:"kidney",pron:"[ˈkɪdni]",kr:"신장",cat:"해부생리",ex:"The kidneys filter waste from the blood."},
+ {en:"respiratory system",pron:"[ˈrɛspərətɔːri ˈsɪstəm]",kr:"호흡기계",cat:"해부생리",ex:"The respiratory system includes the lungs and airways."},
+ {en:"cardiac",pron:"[ˈkɑːrdiæk]",kr:"심장의",cat:"해부생리",ex:"The patient has a history of cardiac disease."},
+ {en:"diabetes",pron:"[ˌdaɪəˈbiːtiːz]",kr:"당뇨병",cat:"질환",ex:"Diabetes requires careful monitoring of blood sugar."},
+ {en:"hypertension",pron:"[ˌhaɪpərˈtɛnʃən]",kr:"고혈압",cat:"질환",ex:"Hypertension increases the risk of stroke."},
+ {en:"infection",pron:"[ɪnˈfɛkʃən]",kr:"감염",cat:"질환",ex:"Signs of infection include redness and swelling."},
+ {en:"fracture",pron:"[ˈfræktʃər]",kr:"골절",cat:"질환",ex:"An X-ray confirmed a fracture of the wrist."},
+ {en:"anemia",pron:"[əˈniːmiə]",kr:"빈혈",cat:"질환",ex:"Anemia can cause fatigue and dizziness."},
+ {en:"discharge",pron:"[ˈdɪstʃɑːrdʒ]",kr:"퇴원; 분비물",cat:"기타",ex:"The patient is scheduled for discharge tomorrow."},
+ {en:"consent",pron:"[kənˈsɛnt]",kr:"동의",cat:"기타",ex:"Informed consent must be obtained before surgery."},
+ {en:"chart",pron:"[tʃɑːrt]",kr:"차트, 기록지",cat:"기타",ex:"Document your findings in the patient's chart."},
+ {en:"triage",pron:"[ˈtriːɑːʒ]",kr:"중증도 분류",cat:"기타",ex:"Triage helps prioritize patients in the ER."},
+ {en:"palliative care",pron:"[ˈpælietɪv kɛr]",kr:"완화 치료",cat:"기타",ex:"Palliative care focuses on comfort, not cure."}
+];
+
+const STORE_KEY = "nursevoca_custom_words_v1";
+function loadCustom(){ try{ return JSON.parse(localStorage.getItem(STORE_KEY)) || []; }catch(e){ return []; } }
+function saveCustom(list){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(list)); }catch(e){} }
+let customWords = loadCustom();
+function allWords(){ return [...BUILTIN, ...customWords]; }
+
+/* ---- tabs ---- */
+document.querySelectorAll('.tabbtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('.tabbtn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById('panel-'+btn.dataset.tab).classList.add('active');
+    if(btn.dataset.tab==='quiz') startQuiz();
+  });
+});
+
+/* ---- 단어장 ---- */
+const CATS = ["전체","활력징후","투약","해부생리","처치·검사","질환","기타"];
+let activeCat = "전체";
+const catRow = document.getElementById('catRow');
+CATS.forEach(c=>{
+  const chip = document.createElement('button');
+  chip.className = 'catchip' + (c==='전체' ? ' active' : '');
+  chip.textContent = c;
+  chip.addEventListener('click', ()=>{
+    activeCat = c;
+    document.querySelectorAll('.catchip').forEach(x=>x.classList.remove('active'));
+    chip.classList.add('active');
+    renderGrid();
+  });
+  catRow.appendChild(chip);
+});
+
+const searchInput = document.getElementById('searchInput');
+searchInput.addEventListener('input', renderGrid);
+
+function renderGrid(){
+  const q = searchInput.value.trim().toLowerCase();
+  const grid = document.getElementById('wordGrid');
+  const emptyNote = document.getElementById('emptyNote');
+  grid.innerHTML = '';
+  const words = allWords().filter(w=>{
+    const matchCat = activeCat==='전체' || w.cat===activeCat;
+    const matchQ = !q || w.en.toLowerCase().includes(q) || w.kr.includes(q);
+    return matchCat && matchQ;
+  });
+  emptyNote.style.display = words.length ? 'none' : 'block';
+  words.forEach(w=>{
+    const card = document.createElement('div');
+    card.className = 'word-card';
+    card.innerHTML = `
+      <div class="word-card-inner">
+        <div class="face front">
+          <span class="cat">${w.cat}</span>
+          <div class="en">${w.en}</div>
+          <div class="pron">${w.pron||''}</div>
+          <div class="flip-hint">탭하여 뜻 보기 →</div>
+        </div>
+        <div class="face back">
+          <div class="kr">${w.kr}</div>
+          ${w.ex? `<div class="ex">"${w.ex}"</div>` : ''}
+          <div class="flip-hint">← 다시 탭</div>
+        </div>
+      </div>`;
+    card.addEventListener('click', ()=> card.classList.toggle('flipped'));
+    grid.appendChild(card);
+  });
+}
+renderGrid();
+
+/* ---- 단어 추가 ---- */
+document.getElementById('addBtn').addEventListener('click', ()=>{
+  const en = document.getElementById('f-en').value.trim();
+  const kr = document.getElementById('f-kr').value.trim();
+  const pron = document.getElementById('f-pron').value.trim();
+  const cat = document.getElementById('f-cat').value;
+  const ex = document.getElementById('f-ex').value.trim();
+  if(!en || !kr){
+    alert('영단어와 한글 뜻은 꼭 입력해 주세요.');
+    return;
+  }
+  customWords.push({en,kr,pron,cat,ex});
+  saveCustom(customWords);
+  document.getElementById('f-en').value='';
+  document.getElementById('f-pron').value='';
+  document.getElementById('f-kr').value='';
+  document.getElementById('f-ex').value='';
+  const toast = document.getElementById('addToast');
+  toast.style.display='block';
+  setTimeout(()=> toast.style.display='none', 1800);
+  renderGrid();
+  renderMyList();
+});
+
+function renderMyList(){
+  const wrap = document.getElementById('myList');
+  wrap.innerHTML = '';
+  if(customWords.length===0){
+    wrap.innerHTML = '<p class="emptynote" style="padding:14px 0;">아직 추가한 단어가 없어요.</p>';
+    return;
+  }
+  customWords.forEach((w,i)=>{
+    const row = document.createElement('div');
+    row.className = 'myitem';
+    row.innerHTML = `<span><b>${w.en}</b> — ${w.kr}</span>`;
+    const del = document.createElement('button');
+    del.className='del'; del.textContent='삭제';
+    del.addEventListener('click', ()=>{
+      customWords.splice(i,1);
+      saveCustom(customWords);
+      renderMyList(); renderGrid();
+    });
+    row.appendChild(del);
+    wrap.appendChild(row);
+  });
+}
+renderMyList();
+
+/* ---- 퀴즈 ---- */
+let quizWords = [], quizIndex = 0, quizScore = 0, quizTotal = 0, answered=false;
+
+function startQuiz(){
+  const pool = allWords();
+  quizWords = [...pool].sort(()=>Math.random()-0.5).slice(0, Math.min(10, pool.length));
+  quizIndex = 0; quizScore = 0; quizTotal = 0; answered=false;
+  document.getElementById('scoreNum').textContent = '0/0';
+  renderQuizQuestion();
+}
+
+function renderQuizQuestion(){
+  const area = document.getElementById('quizArea');
+  document.getElementById('quizIdx').textContent = `${quizIndex+1}/${quizWords.length}`;
+  if(quizIndex >= quizWords.length){
+    const pct = quizWords.length ? Math.round(quizScore/quizWords.length*100) : 0;
+    area.innerHTML = `
+      <div class="quiz-done">
+        <div class="big">${pct>=80?'🏆':pct>=50?'🌱':'💪'}</div>
+        <h2>퀴즈 완료!</h2>
+        <p>${quizWords.length}문제 중 ${quizScore}개 정답 (${pct}%)</p>
+        <button class="btn btn-primary" style="margin-top:14px;" id="retryBtn">다시 풀기</button>
+      </div>`;
+    document.getElementById('retryBtn').addEventListener('click', startQuiz);
+    return;
+  }
+  const correct = quizWords[quizIndex];
+  const pool = allWords().filter(w=>w.en!==correct.en);
+  const wrongs = [...pool].sort(()=>Math.random()-0.5).slice(0,3);
+  const options = [correct, ...wrongs].sort(()=>Math.random()-0.5);
+  answered = false;
+  area.innerHTML = `
+    <div class="quizcard">
+      <div class="qmeta">이 단어의 뜻은 무엇일까요?</div>
+      <div class="qword">${correct.en}</div>
+      <div class="qpron">${correct.pron||''}</div>
+      <div class="options" id="optsWrap"></div>
+      <div class="nextrow"><button class="btn btn-next" id="nextBtn">다음 문제 →</button></div>
+    </div>`;
+  const optsWrap = document.getElementById('optsWrap');
+  options.forEach(o=>{
+    const b = document.createElement('button');
+    b.className = 'opt';
+    b.textContent = o.kr;
+    b.addEventListener('click', ()=>{
+      if(answered) return;
+      answered = true;
+      quizTotal++;
+      const isCorrect = o.en===correct.en;
+      if(isCorrect) quizScore++;
+      document.querySelectorAll('.opt').forEach(x=>{
+        x.disabled = true;
+        if(x.textContent===correct.kr) x.classList.add('correct');
+      });
+      if(!isCorrect) b.classList.add('wrong');
+      document.getElementById('scoreNum').textContent = `${quizScore}/${quizTotal}`;
+      document.getElementById('nextBtn').style.display='inline-block';
+    });
+    optsWrap.appendChild(b);
+  });
+  document.getElementById('nextBtn').addEventListener('click', ()=>{
+    quizIndex++;
+    renderQuizQuestion();
+  });
+}
+</script>
+</body>
+</html>
